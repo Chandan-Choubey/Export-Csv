@@ -15,10 +15,10 @@ app.get("/", (req, res) => {
 });
 
 app.post("/convert", upload.single("file"), async (req, res) => {
-  const path = "./uploads";
+  const Uploadpath = "./uploads";
 
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path);
+  if (!fs.existsSync(Uploadpath)) {
+    fs.mkdirSync(Uploadpath);
   }
   const input = req.body;
   const workbook = new ExcelJS.Workbook();
