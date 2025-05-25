@@ -4,10 +4,11 @@ const fs = require("fs");
 const ExcelJS = require("exceljs");
 const archiver = require("archiver");
 const path = require("path");
+const cors = require("cors");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
-
+app.use(cors())
 app.use(express.json());
 
 app.get("/", (req, res) => {
