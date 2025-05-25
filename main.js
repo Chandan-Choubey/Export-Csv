@@ -157,7 +157,7 @@ app.post("/convert", upload.single("file"), async (req, res) => {
       const targetRow = sheet.lastRow.number + 1;
 
       // Set the column width (1 unit ≈ 7.5px)
-      sheet.getColumn(targetCol).width = imageWidthPx / 7.5;
+      sheet.getColumn(targetCol).width = imageWidthPx / 7.0017;
 
       // Set the row height (1 unit ≈ 0.75pt ≈ 1.33px, ExcelJS uses points)
       sheet.getRow(targetRow).height = imageHeightPx / 1.33;
