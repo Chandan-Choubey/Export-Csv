@@ -8,7 +8,7 @@ const cors = require("cors");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -22,6 +22,7 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     fs.mkdirSync(Uploadpath);
   }
   const input = req.body;
+  console.log(input);
   const workbook = new ExcelJS.Workbook();
   const csvFiles = [];
 
@@ -149,8 +150,8 @@ app.post("/convert", upload.single("file"), async (req, res) => {
         extension: imageExtension,
       });
 
-      const imageWidthPx = 250; // Set your desired image width
-      const imageHeightPx = 150; // Set your desired image height
+      const imageWidthPx = 500; // Set your desired image width
+      const imageHeightPx = 500; // Set your desired image height
 
       const targetCol = 1; // Excel column A = 1
       const targetRow = sheet.lastRow.number + 1;
