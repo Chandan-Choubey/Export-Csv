@@ -43,13 +43,15 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     const input = req.body;
     const workbook = new ExcelJS.Workbook();
     const csvFiles = [];
-
+    // console.log(input);
+    // console.log(Object.entries(input));
     for (const [sheetName, rawSheet] of Object.entries(input)) {
-      let sheetData, style;
+      let sheetData, style, config;
       try {
         const parsed = JSON.parse(rawSheet);
         sheetData = parsed.data;
         style = parsed.style || {};
+        config = parsed.config || {};
       } catch {
         continue;
       }
@@ -122,14 +124,36 @@ app.post("/convert", upload.single("file"), async (req, res) => {
         col.width = maxLen + 2;
       });
 
-      if (sheetData[0].length >= 3) {
-        const startRow = 2;
+      if (config.sumColumn && config.startRow && config.operation) {
+        const supportedOps = ["SUM", "AVERAGE", "MIN", "MAX", "COUNT"];
+        if (!supportedOps.includes(config.operation)) {
+          return res.status(400).json({
+            error: `Invalid or missing operation. Supported operations are: ${supportedOps.join(
+              ", "
+            )}.`,
+          });
+        }
         const endRow = sheet.lastRow.number;
-        const labelCell = sheet.getCell(`C${endRow + 1}`);
-        const formulaCell = sheet.getCell(`D${endRow + 1}`);
-        labelCell.value = "Total Visitors";
+
+        const columnLetter = (index) => String.fromCharCode(64 + index);
+
+        const labelColLetter = columnLetter(
+          config.labelColumn || config.sumColumn
+        );
+        const formulaColLetter = columnLetter(
+          config.formulaColumn || config.sumColumn + 1
+        );
+        const targetColumnLetter = columnLetter(config.sumColumn);
+
+        const labelCell = sheet.getCell(`${labelColLetter}${endRow + 1}`);
+        const formulaCell = sheet.getCell(`${formulaColLetter}${endRow + 1}`);
+
+        labelCell.value = config.label || config.operation + " Result";
         labelCell.font = { bold: true };
-        formulaCell.value = { formula: `SUM(C${startRow}:C${endRow})` };
+
+        formulaCell.value = {
+          formula: `${config.operation}(${targetColumnLetter}${config.startRow}:${targetColumnLetter}${endRow})`,
+        };
       }
 
       if (req.file) {
